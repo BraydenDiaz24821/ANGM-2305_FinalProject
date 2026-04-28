@@ -1,4 +1,5 @@
 import pygame
+import random
 
 
 def main():
@@ -9,9 +10,12 @@ def main():
     fps = 60
     scroll = 0
     scroll_speed = 4
+    pipe_frequency = 3000
+    last_pipe = pygame.time.get_ticks() - pipe_frequency
     background = pygame.image.load("FF_Background.png")
     background_dummy = pygame.transform.scale(background, (1500, 700))
     foreground = pygame.image.load("FF_Foreground.jpg")
+    pipe_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
     player = PlayerObject(200, -300)
     player_group.add(player)
@@ -26,6 +30,9 @@ def main():
         if player.rect.bottom >= 1300:
             running = False
  
+        if pygame.sprite.groupcollide(player_group, pipe_group, False, False):
+            running = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -33,12 +40,23 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     running = False
 
+        time_now = pygame.time.get_ticks()
+        if time_now - last_pipe > pipe_frequency:
+            pipe_height = random.randint(-150, 150)
+            top_pipe = PipeObject(2000, 460 + pipe_height, -1)
+            bottom_pipe = PipeObject(2000, 460 + pipe_height, 1)
+            pipe_group.add(top_pipe)
+            pipe_group.add(bottom_pipe)
+            last_pipe = time_now
+
         screen.blit(background_dummy, (0, 0))
         for i in range(2):
             screen.blit(foreground, (i * 800 + scroll, 600))
         scroll -= scroll_speed
         if abs(scroll) > 89:
            scroll = 0
+        pipe_group.draw(screen)
+        pipe_group.update()
         player_group.draw(screen)
         player_group.update()
  
@@ -70,7 +88,6 @@ class PlayerObject(pygame.sprite.Sprite):
             self.vel = -10
         if keys[pygame.K_SPACE] == 0:
             self.clicked = False
-        
         self.counter += 1
         swap_cooldown = 5
         if self.counter > swap_cooldown:
@@ -81,6 +98,24 @@ class PlayerObject(pygame.sprite.Sprite):
         self.image = self.images[self.index]
 
         self.image = pygame.transform.rotate(self.images[self.index], self.vel * -1)
+
+
+class PipeObject(pygame.sprite.Sprite):
+    def __init__(self, x, y, position):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("FF_PipeObject.jpeg")
+        self.rect = self.image.get_rect()
+
+        if position == -1:
+            self.rect.topleft = [x, y + int(470 / 2)]
+        if position == 1:
+            self.image = pygame.transform.flip(self.image, False, True)
+            self.rect.bottomleft = [x, y - int(470 / 2)]
+
+    def update(self):
+        self.rect.x -= 5
+        if self.rect.right < 0:
+            self.kill()
 
 
 if __name__ == "__main__":
