@@ -12,6 +12,10 @@ def main():
     scroll_speed = 4
     pipe_frequency = 3000
     last_pipe = pygame.time.get_ticks() - pipe_frequency
+    score = 0
+    pass_pipe = False
+    font = pygame.font.SysFont("Bauhaus 93", 100)
+    font_color = (255, 0, 0)
     background = pygame.image.load("FF_Background.png")
     background_dummy = pygame.transform.scale(background, (1500, 700))
     foreground = pygame.image.load("FF_Foreground.jpg")
@@ -20,6 +24,10 @@ def main():
     player = PlayerObject(200, -300)
     player_group.add(player)
     running = True
+
+    def draw_text(text, font, text_col, x, y):
+        img = font.render(text, True, text_col)
+        screen.blit(img, (x, y))
 
     while running:
         player.vel += 0.5
@@ -60,6 +68,17 @@ def main():
         player_group.draw(screen)
         player_group.update()
  
+        if len(pipe_group) > 0:
+            if player_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.left\
+                and player_group.sprites()[0].rect.right < pipe_group.sprites()[0].rect.right\
+                and pass_pipe == False:
+                pass_pipe = False
+            if pass_pipe == False:
+                if player_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.right:
+                    score += 1 / 8.5 / 2
+                    pass_pipe = False
+        draw_text(str(round(score)), font, font_color, int(100 / 2), 20)
+
         pygame.display.update()
         clock.tick(fps)
     pygame.quit
