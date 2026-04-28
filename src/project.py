@@ -13,11 +13,19 @@ def main():
     background_dummy = pygame.transform.scale(background, (1500, 700))
     foreground = pygame.image.load("FF_Foreground.jpg")
     player_group = pygame.sprite.Group()
-    player = PlayerObject(200, int(936 / 2))
+    player = PlayerObject(200, -300)
     player_group.add(player)
     running = True
 
     while running:
+        player.vel += 0.5
+        if player.vel > 8:
+            player.vel = 8
+        if player.rect.bottom < 1301:
+            player.rect.y += int(player.vel)
+        if player.rect.bottom >= 1300:
+            running = False
+ 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -51,8 +59,18 @@ class PlayerObject(pygame.sprite.Sprite):
         self.image = self.images[self.index]
         self.rect = self.image.get_rect()
         self.rect.center = [x, y]
+        self.vel = 0
+        self.press = False
 
     def update(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE] == 1 and self.clicked == False:
+            self.clicked = True
+            self.press = True
+            self.vel = -10
+        if keys[pygame.K_SPACE] == 0:
+            self.clicked = False
+        
         self.counter += 1
         swap_cooldown = 5
         if self.counter > swap_cooldown:
@@ -61,6 +79,8 @@ class PlayerObject(pygame.sprite.Sprite):
             if self.index >= len(self.images):
                 self.index = 0
         self.image = self.images[self.index]
+
+        self.image = pygame.transform.rotate(self.images[self.index], self.vel * -1)
 
 
 if __name__ == "__main__":
