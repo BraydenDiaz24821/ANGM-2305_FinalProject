@@ -23,23 +23,47 @@ def main():
     player_group = pygame.sprite.Group()
     player = PlayerObject(200, -300)
     player_group.add(player)
+    player_flight = False
+    pipe_movement = False
+    bf_movement = False
+    score_counter = False
+    intro = True
     running = True
 
-    def draw_text(text, font, text_col, x, y):
-        img = font.render(text, True, text_col)
-        screen.blit(img, (x, y))
-
     while running:
-        player.vel += 0.5
-        if player.vel > 8:
-            player.vel = 8
-        if player.rect.bottom < 1301:
-            player.rect.y += int(player.vel)
-        if player.rect.bottom >= 1300:
-            running = False
- 
-        if pygame.sprite.groupcollide(player_group, pipe_group, False, False):
-            running = False
+        if player_flight == True:
+            player.vel += 0.5
+            if player.vel > 8:
+                player.vel = 8
+            if player.rect.bottom < 1301:
+                player.rect.y += int(player.vel)
+            if player.rect.bottom >= 1300:
+                running = False
+            if player.rect.bottom <= -301:
+                running = False
+
+        if pipe_movement == True:
+            time_now = pygame.time.get_ticks()
+            if time_now - last_pipe > pipe_frequency:
+                pipe_height = random.randint(-150, 150)
+                top_pipe = PipeObject(2000, 460 + pipe_height, -1)
+                bottom_pipe = PipeObject(2000, 460 + pipe_height, 1)
+                pipe_group.add(top_pipe)
+                pipe_group.add(bottom_pipe)
+                last_pipe = time_now
+    
+        screen.blit(background_dummy, (0, 0))
+        for i in range(2):
+            screen.blit(foreground, (i * 800 + scroll, 600))
+        if bf_movement == True:
+            scroll -= scroll_speed
+            if abs(scroll) > 89:
+                scroll = 0
+
+        if intro == True:
+            intro_image = pygame.image.load("FF_Intro.png")
+            intro_image_dummy = pygame.transform.scale(intro_image, (1500, 1000))
+            screen.blit(intro_image_dummy, (0, -50))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -47,37 +71,43 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
-
-        time_now = pygame.time.get_ticks()
-        if time_now - last_pipe > pipe_frequency:
-            pipe_height = random.randint(-150, 150)
-            top_pipe = PipeObject(2000, 460 + pipe_height, -1)
-            bottom_pipe = PipeObject(2000, 460 + pipe_height, 1)
-            pipe_group.add(top_pipe)
-            pipe_group.add(bottom_pipe)
-            last_pipe = time_now
-
-        screen.blit(background_dummy, (0, 0))
-        for i in range(2):
-            screen.blit(foreground, (i * 800 + scroll, 600))
-        scroll -= scroll_speed
-        if abs(scroll) > 89:
-           scroll = 0
+            if event.type == pygame.KEYDOWN and player_flight == False:
+                if event.key == pygame.K_LSHIFT:
+                    player_flight = True
+                    pipe_movement = True
+                    bf_movement = True
+                    score_counter = True
+                    intro = False
+                if event.key == pygame.K_RSHIFT:
+                    player_flight = True
+                    pipe_movement = True
+                    bf_movement = True
+                    score_counter = True
+                    intro = False
+        
         pipe_group.draw(screen)
         pipe_group.update()
         player_group.draw(screen)
         player_group.update()
+
+        if pygame.sprite.groupcollide(player_group, pipe_group, False, False):
+            running = False
  
-        if len(pipe_group) > 0:
-            if player_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.left\
-                and player_group.sprites()[0].rect.right < pipe_group.sprites()[0].rect.right\
-                and pass_pipe == False:
-                pass_pipe = False
-            if pass_pipe == False:
-                if player_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.right:
-                    score += 1 / 8.5 / 2
+        if score_counter == True:
+            def draw_text(text, font, text_col, x, y):
+                img = font.render(text, True, text_col)
+                screen.blit(img, (x, y))
+
+            if len(pipe_group) > 0:
+                if player_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.left\
+                    and player_group.sprites()[0].rect.right < pipe_group.sprites()[0].rect.right\
+                    and pass_pipe == False:
                     pass_pipe = False
-        draw_text(str(round(score)), font, font_color, int(100 / 2), 20)
+                if pass_pipe == False:
+                    if player_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.right:
+                        score += 1 / 8.5 / 2
+                        pass_pipe = False
+            draw_text(str(round(score)), font, font_color, int(100 / 2), 20)
 
         pygame.display.update()
         clock.tick(fps)
