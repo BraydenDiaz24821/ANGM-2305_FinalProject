@@ -61,7 +61,7 @@ def main():
                 pipe_group.add(top_pipe)
                 pipe_group.add(bottom_pipe)
                 last_pipe = time_now
-    
+
         # background & foreground image spawn
         screen.blit(background_dummy, (0, 0))
         for i in range(2):
