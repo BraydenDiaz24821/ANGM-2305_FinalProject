@@ -180,7 +180,7 @@ class PlayerObject(pygame.sprite.Sprite):
 
 class PipeObject(pygame.sprite.Sprite):
     
-    # sprite spawn & positioning
+    # pipe sprite spawn & positioning
     def __init__(self, x, y, position):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load("FF_PipeObject.jpeg")
@@ -191,7 +191,7 @@ class PipeObject(pygame.sprite.Sprite):
             self.image = pygame.transform.flip(self.image, False, True)
             self.rect.bottomleft = [x, y - int(470 / 2)]
 
-    # offscreen deletion
+    # pipe offscreen deletion
     def update(self):
         self.rect.x -= 5
         if self.rect.right < 0:
