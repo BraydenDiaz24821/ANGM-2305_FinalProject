@@ -28,6 +28,8 @@ def main():
     bf_movement = False
     score_counter = False
     intro = True
+    game_end = False
+    visibility = True
     running = True
 
     while running:
@@ -38,9 +40,13 @@ def main():
             if player.rect.bottom < 1301:
                 player.rect.y += int(player.vel)
             if player.rect.bottom >= 1300:
-                running = False
+                game_end = True
+                visibility = False
+                score_counter = False
             if player.rect.bottom <= -301:
-                running = False
+                game_end = True
+                visibility = False
+                score_counter = False
 
         if pipe_movement == True:
             time_now = pygame.time.get_ticks()
@@ -65,6 +71,12 @@ def main():
             intro_image_dummy = pygame.transform.scale(intro_image, (1500, 1000))
             screen.blit(intro_image_dummy, (0, -50))
 
+        if game_end == True:
+            gameEnd_image = pygame.image.load("FF_GameEnd.png")
+            gameEnd_image_dummy = pygame.transform.scale(gameEnd_image, (1500, 1000))
+            screen.blit(gameEnd_image_dummy, (0, -50))
+
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -85,13 +97,19 @@ def main():
                     score_counter = True
                     intro = False
         
-        pipe_group.draw(screen)
-        pipe_group.update()
-        player_group.draw(screen)
-        player_group.update()
+        if visibility == True:
+            pipe_group.draw(screen)
+            pipe_group.update()
+            player_group.draw(screen)
+            player_group.update()
 
         if pygame.sprite.groupcollide(player_group, pipe_group, False, False):
-            running = False
+            visibility = False
+            player_flight = False
+            pipe_movement = False
+            bf_movement = False
+            score_counter = False
+            game_end = True
  
         if score_counter == True:
             def draw_text(text, font, text_col, x, y):
