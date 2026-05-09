@@ -16,7 +16,8 @@ def main():
     score = 0
     pass_pipe = False
     font = pygame.font.SysFont("Bauhaus 93", 100)
-    font_color = (255, 0, 0)
+    font_II = pygame.font.SysFont("Bauhaus 93", 120)
+    font_color = (255, 248, 239)
     background = pygame.image.load("FF_Background.png")
     background_dummy = pygame.transform.scale(background, (1600, 1000))
     foreground_dummy = pygame.image.load("FF_Foreground.png")
@@ -82,8 +83,8 @@ def main():
         # intro image spawn
         if intro == True:
             intro_image = pygame.image.load("FF_Intro.png")
-            intro_image_dummy = pygame.transform.scale(intro_image, (1500, 1000))
-            screen.blit(intro_image_dummy, (0, -50))
+            intro_image_dummy = pygame.transform.scale(intro_image, (1470, 1020))
+            screen.blit(intro_image_dummy, (0, -30))
 
         # player start & quit
         for event in pygame.event.get():
@@ -129,7 +130,7 @@ def main():
         if score_counter == True:
             def draw_text(text, font, text_col, x, y):
                 img = font.render(text, True, text_col)
-                screen.blit(img, (77, 48))
+                screen.blit(img, (76, 46))
             if len(pipe_group) > 0:
                 if player_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.left\
                     and player_group.sprites()[0].rect.right < pipe_group.sprites()[0].rect.right\
@@ -144,12 +145,12 @@ def main():
         # game-end image spawn
         if game_end == True:
             gameEnd_image = pygame.image.load("FF_GameEnd.png")
-            gameEnd_image_dummy = pygame.transform.scale(gameEnd_image, (1500, 1000))
-            screen.blit(gameEnd_image_dummy, (0, -50))
-            def draw_text(text, font, text_col, x, y):
-                img = font.render(text, True, text_col)
-                screen.blit(img, (700, 500))
-            draw_text(str(round(score)), font, (255,255, 255), int(100 / 2), 20)
+            gameEnd_image_dummy = pygame.transform.scale(gameEnd_image, (1470, 1020))
+            screen.blit(gameEnd_image_dummy, (0, -30))
+            def draw_text(text, font_II, text_col, x, y):
+                img = font_II.render(text, True, text_col)
+                screen.blit(img, (908, 501.5))
+            draw_text(str(round(score)), font_II, (255, 255, 255), int(100 / 2), 20)
 
         pygame.display.update()
         clock.tick(fps)
