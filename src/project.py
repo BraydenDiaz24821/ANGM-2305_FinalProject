@@ -8,10 +8,10 @@ def main():
     pygame.init()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
-    fps = 60
+    fps = 80
     scroll = 0
-    scroll_speed = 4
-    pipe_frequency = 3000
+    scroll_speed = 8
+    pipe_frequency = 1200
     last_pipe = pygame.time.get_ticks() - pipe_frequency
     score = 0
     pass_pipe = False
@@ -42,8 +42,8 @@ def main():
         # player gravity & y-axis limiters
         if player_flight == True:
             player.vel += 1.3
-            if player.vel > 16:
-                player.vel = 16
+            if player.vel > 20:
+                player.vel = 20
             if player.rect.bottom < 1301:
                 player.rect.y += int(player.vel)
             if player.rect.bottom >= 1300:
@@ -62,8 +62,8 @@ def main():
             time_now = pygame.time.get_ticks()
             if time_now - last_pipe > pipe_frequency:
                 pipe_height = random.randint(-150, 150)
-                top_pipe = PipeObject(1500, 460 + pipe_height, -1)
-                bottom_pipe = PipeObject(1500, 460 + pipe_height, 1)
+                top_pipe = PipeObject(2000, 460 + pipe_height, -1)
+                bottom_pipe = PipeObject(2000, 460 + pipe_height, 1)
                 pipe_group.add(top_pipe)
                 pipe_group.add(bottom_pipe)
                 last_pipe = time_now
@@ -137,7 +137,7 @@ def main():
                     pass_pipe = False
                 if pass_pipe == False:
                     if player_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.right:
-                        score += 1 / 8.5 / 5
+                        score += 1 / 15
                         pass_pipe = False
             draw_text(str(round(score)), font, font_color, int(100 / 2), 20)
 
@@ -202,14 +202,14 @@ class PipeObject(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(image_dummy, (120, 500))
         self.rect = self.image.get_rect()
         if position == -1:
-            self.rect.topleft = [x, y + int(470 / 2)]
+            self.rect.topleft = [x, y + int(430 / 2)]
         if position == 1:
             self.image = pygame.transform.flip(self.image, False, True)
-            self.rect.bottomleft = [x, y - int(470 / 2)]
+            self.rect.bottomleft = [x, y - int(430 / 2)]
 
-    # pipe offscreen deletion
+    # pipe speed & offscreen deletion
     def update(self):
-        self.rect.x -= 5
+        self.rect.x -= 20
         if self.rect.right < 0:
             self.kill()
 
