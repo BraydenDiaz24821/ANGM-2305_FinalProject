@@ -18,11 +18,14 @@ def main():
     font = pygame.font.SysFont("Bauhaus 93", 100)
     font_color = (255, 0, 0)
     background = pygame.image.load("FF_Background.png")
-    background_dummy = pygame.transform.scale(background, (1500, 700))
-    foreground = pygame.image.load("FF_Foreground.jpg")
+    background_dummy = pygame.transform.scale(background, (1600, 1000))
+    foreground_dummy = pygame.image.load("FF_Foreground.png")
+    foreground = pygame.transform.scale(foreground_dummy, (1600, 1000))
+    ScoreCounter_dummy = pygame.image.load("FF_ScoreCounter.png")
+    ScoreCounter = pygame.transform.scale(ScoreCounter_dummy, (230, 230))
     pipe_group = pygame.sprite.Group()
     player_group = pygame.sprite.Group()
-    player = PlayerObject(200, -300)
+    player = PlayerObject(400, -300)
     player_group.add(player)
     player_flight = False
     pipe_movement = False
@@ -31,24 +34,27 @@ def main():
     intro = True
     game_end = False
     visibility = True
+    SC_visibility = False
     running = True
 
     while running:
 
         # player gravity & y-axis limiters
         if player_flight == True:
-            player.vel += 0.5
-            if player.vel > 8:
-                player.vel = 8
+            player.vel += 1.3
+            if player.vel > 16:
+                player.vel = 16
             if player.rect.bottom < 1301:
                 player.rect.y += int(player.vel)
             if player.rect.bottom >= 1300:
                 game_end = True
                 visibility = False
+                SC_visibility = False
                 score_counter = False
             if player.rect.bottom <= -301:
                 game_end = True
                 visibility = False
+                SC_visibility = False
                 score_counter = False
 
         # pipe spawn & x-axis movement
@@ -56,19 +62,21 @@ def main():
             time_now = pygame.time.get_ticks()
             if time_now - last_pipe > pipe_frequency:
                 pipe_height = random.randint(-150, 150)
-                top_pipe = PipeObject(2000, 460 + pipe_height, -1)
-                bottom_pipe = PipeObject(2000, 460 + pipe_height, 1)
+                top_pipe = PipeObject(1500, 460 + pipe_height, -1)
+                bottom_pipe = PipeObject(1500, 460 + pipe_height, 1)
                 pipe_group.add(top_pipe)
                 pipe_group.add(bottom_pipe)
                 last_pipe = time_now
+                SC_visibility = True
+                score_counter = True
 
         # background & foreground image spawn
         screen.blit(background_dummy, (0, 0))
         for i in range(2):
-            screen.blit(foreground, (i * 800 + scroll, 600))
+            screen.blit(foreground, (i * 0 + scroll, 0))
         if bf_movement == True:
             scroll -= scroll_speed
-            if abs(scroll) > 89:
+            if abs(scroll) > 100:
                 scroll = 0
 
         # intro image spawn
@@ -76,12 +84,6 @@ def main():
             intro_image = pygame.image.load("FF_Intro.png")
             intro_image_dummy = pygame.transform.scale(intro_image, (1500, 1000))
             screen.blit(intro_image_dummy, (0, -50))
-
-        # game-end image spawn
-        if game_end == True:
-            gameEnd_image = pygame.image.load("FF_GameEnd.png")
-            gameEnd_image_dummy = pygame.transform.scale(gameEnd_image, (1500, 1000))
-            screen.blit(gameEnd_image_dummy, (0, -50))
 
         # player start & quit
         for event in pygame.event.get():
@@ -95,13 +97,11 @@ def main():
                     player_flight = True
                     pipe_movement = True
                     bf_movement = True
-                    score_counter = True
                     intro = False
                 if event.key == pygame.K_RSHIFT:
                     player_flight = True
                     pipe_movement = True
                     bf_movement = True
-                    score_counter = True
                     intro = False
         
         # sprite visibility
@@ -110,10 +110,15 @@ def main():
             pipe_group.update()
             player_group.draw(screen)
             player_group.update()
+        
+        # screen counter visibility
+        if SC_visibility == True:
+            screen.blit(ScoreCounter, (0, -70))
 
         # player-pipe collision 
         if pygame.sprite.groupcollide(player_group, pipe_group, False, False):
             visibility = False
+            SC_visibility = False
             player_flight = False
             pipe_movement = False
             bf_movement = False
@@ -124,7 +129,7 @@ def main():
         if score_counter == True:
             def draw_text(text, font, text_col, x, y):
                 img = font.render(text, True, text_col)
-                screen.blit(img, (x, y))
+                screen.blit(img, (77, 48))
             if len(pipe_group) > 0:
                 if player_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.left\
                     and player_group.sprites()[0].rect.right < pipe_group.sprites()[0].rect.right\
@@ -132,9 +137,19 @@ def main():
                     pass_pipe = False
                 if pass_pipe == False:
                     if player_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.right:
-                        score += 1 / 8.5 / 2
+                        score += 1 / 8.5 / 5
                         pass_pipe = False
             draw_text(str(round(score)), font, font_color, int(100 / 2), 20)
+
+        # game-end image spawn
+        if game_end == True:
+            gameEnd_image = pygame.image.load("FF_GameEnd.png")
+            gameEnd_image_dummy = pygame.transform.scale(gameEnd_image, (1500, 1000))
+            screen.blit(gameEnd_image_dummy, (0, -50))
+            def draw_text(text, font, text_col, x, y):
+                img = font.render(text, True, text_col)
+                screen.blit(img, (700, 500))
+            draw_text(str(round(score)), font, (255,255, 255), int(100 / 2), 20)
 
         pygame.display.update()
         clock.tick(fps)
@@ -164,7 +179,7 @@ class PlayerObject(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE] == 1 and self.clicked == False:
             self.clicked = True
             self.press = True
-            self.vel = -10
+            self.vel = -16
         if keys[pygame.K_SPACE] == 0:
             self.clicked = False
         self.counter += 1
@@ -175,7 +190,7 @@ class PlayerObject(pygame.sprite.Sprite):
             if self.index >= len(self.images):
                 self.index = 0
         self.image = self.images[self.index]
-        self.image = pygame.transform.rotate(self.images[self.index], self.vel * -1)
+        self.image = pygame.transform.rotate(self.images[self.index], self.vel * -.5)
 
 
 class PipeObject(pygame.sprite.Sprite):
@@ -183,7 +198,8 @@ class PipeObject(pygame.sprite.Sprite):
     # pipe sprite spawn & positioning
     def __init__(self, x, y, position):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load("FF_PipeObject.jpeg")
+        image_dummy = pygame.image.load("FF_PipeObject.png")
+        self.image = pygame.transform.scale(image_dummy, (120, 500))
         self.rect = self.image.get_rect()
         if position == -1:
             self.rect.topleft = [x, y + int(470 / 2)]
