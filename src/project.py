@@ -8,10 +8,10 @@ def main():
     pygame.init()
     clock = pygame.time.Clock()
     screen = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
-    fps = 80
+    fps = 100
     scroll = 0
     scroll_speed = 8
-    pipe_frequency = 1200
+    pipe_frequency = 1350
     last_pipe = pygame.time.get_ticks() - pipe_frequency
     score = 0
     pass_pipe = False
@@ -52,19 +52,21 @@ def main():
                 visibility = False
                 SC_visibility = False
                 score_counter = False
+                bf_movement = False
             if player.rect.bottom <= -301:
                 game_end = True
                 visibility = False
                 SC_visibility = False
                 score_counter = False
+                bf_movement = False
 
         # pipe spawn & x-axis movement
         if pipe_movement == True:
             time_now = pygame.time.get_ticks()
             if time_now - last_pipe > pipe_frequency:
-                pipe_height = random.randint(-150, 150)
-                top_pipe = PipeObject(2000, 460 + pipe_height, -1)
-                bottom_pipe = PipeObject(2000, 460 + pipe_height, 1)
+                pipe_height = random.randint(-130, 130)
+                top_pipe = PipeObject(1900, 460 + pipe_height, -1)
+                bottom_pipe = PipeObject(1900, 460 + pipe_height, 1)
                 pipe_group.add(top_pipe)
                 pipe_group.add(bottom_pipe)
                 last_pipe = time_now
@@ -138,7 +140,7 @@ def main():
                     pass_pipe = False
                 if pass_pipe == False:
                     if player_group.sprites()[0].rect.left > pipe_group.sprites()[0].rect.right:
-                        score += 1 / 15
+                        score += 1 / 12.5
                         pass_pipe = False
             draw_text(str(round(score)), font, font_color, int(100 / 2), 20)
 
@@ -165,13 +167,14 @@ class PlayerObject(pygame.sprite.Sprite):
         self.images = []
         self.index = 0
         self.counter = 0
-        for num in range(1, 4):
+        for num in range(1, 5):
             img = pygame.image.load(f"FF_PlayerObject{num}.png")
-            self.images.append(img)
+            img_dummy = pygame.transform.scale(img, (350, 240))
+            self.images.append(img_dummy)
         self.image = self.images[self.index]
         self.rect = self.image.get_rect()
         self.rect.center = [x, y]
-        self.vel = 0
+        self.vel = 2
         self.press = False
 
     # player jump motion
