@@ -1,0 +1,2 @@
+# Windows: python3 -m pip install pygame
+# MacOS: python -m pip install pygame
