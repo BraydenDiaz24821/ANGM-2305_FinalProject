@@ -1,4 +1,4 @@
-# ANGM-2305 Final Project - Flappy Bird Ripoff
+# Flappy Bird Ripoff
 
 ## Notable URLs
 GitHub URL: https://github.com/BraydenDiaz24821/ANGM-2305_FinalProject
